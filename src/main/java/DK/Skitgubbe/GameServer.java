@@ -14,7 +14,6 @@ public class GameServer {
     }
 
     private Map<String, String> usernames = new HashMap<String, String>();
-    private Map<String, String> usernames2 = new HashMap<String, String>();
 
 
     @OnOpen
