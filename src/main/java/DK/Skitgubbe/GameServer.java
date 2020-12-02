@@ -9,47 +9,30 @@ import java.util.Map;
 @ServerEndpoint("/ws")
 public class GameServer {
 
-    public static void main(String[] args) {
-    System.out.println("Hello world");
-    }
-
-    private Map<String, String> usernames = new HashMap<String, String>();
-
 
     @OnOpen
-    public void open(Session session) throws IOException, EncodeException {
-        session.getBasicRemote().sendText("(Server): Welcome to the chat room. Please state your username to begin.");
-
+    public void onOpen(Session session) {
+        System.out.println("onOpen::" + session.getId());
     }
     @OnClose
-    public void close(Session session) throws IOException, EncodeException {
-        String userId = session.getId();
-        if (usernames.containsKey(userId)) {
-            String username = usernames.get(userId);
-            usernames.remove(userId);
-            for (Session peer : session.getOpenSessions())
-                peer.getBasicRemote().sendText("(Server): " + username + " left the chat room.");
-        }
+    public void onClose(Session session) {
+        System.out.println("onClose::" +  session.getId());
     }
 
     @OnMessage
-    public void handleMessage(String message, Session session) throws IOException, EncodeException {
-        String userId = session.getId();
-        if (usernames.containsKey(userId)) {
-            String username = usernames.get(userId);
-            for (Session peer : session.getOpenSessions())
-                peer.getBasicRemote().sendText("(" + username + "): " + message);
-        } else {
-            if (usernames.containsValue(message) || message.toLowerCase().equals("server"))
-                session.getBasicRemote().sendText("(Server): That username is already in use. Please try again.");
-            else {
-                usernames.put(userId, message);
-                session.getBasicRemote().sendText("(Server): Welcome, " + message + "!");
-                for (Session peer : session.getOpenSessions())
-                    if (!peer.getId().equals(userId))
-                        peer.getBasicRemote().sendText("(Server): " + message + " joined the chat room.");
-            }
+    public void onMessage(String message, Session session) {
+        System.out.println("onMessage::From=" + session.getId() + " Message=" + message);
+
+        try {
+            session.getBasicRemote().sendText("Hello Client " + session.getId() + "!");
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+    }
+
+    @OnError
+    public void onError(Throwable t) {
+        System.out.println("onError::" + t.getMessage());
     }
 
 
